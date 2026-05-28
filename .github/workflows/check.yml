@@ -20,7 +20,7 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE for the job.
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Gradle test
         run: |
@@ -58,19 +58,54 @@ jobs:
           rustup target add x86_64-unknown-linux-gnu
           rustup target add aarch64-linux-android
 
-      - name: Setup Java 11
-        uses: actions/setup-java@v2
+      - id: resolve-android-versions
+        name: Resolve Android Versions
+        shell: bash
+        run: |
+          COMPILE_SDK=$(grep -E '^compile_sdk=' version.properties | head -n1 | cut -d'=' -f2-)
+          NDK_VERSION=$(grep -E '^ndk_version=' version.properties | head -n1 | cut -d'=' -f2-)
+          NDK_RELEASE=$(grep -E '^ndk_release=' version.properties | head -n1 | cut -d'=' -f2-)
+          if [ -z "$COMPILE_SDK" ]; then
+            echo "compile_sdk is missing in version.properties" >&2
+            exit 1
+          fi
+          if [ -z "$NDK_VERSION" ]; then
+            echo "ndk_version is missing in version.properties" >&2
+            exit 1
+          fi
+          if [ -z "$NDK_RELEASE" ]; then
+            echo "ndk_release is missing in version.properties" >&2
+            exit 1
+          fi
+          echo "COMPILE_SDK=${COMPILE_SDK}" >> "$GITHUB_ENV"
+          echo "NDK_VERSION=${NDK_VERSION}" >> "$GITHUB_ENV"
+          echo "NDK_RELEASE=${NDK_RELEASE}" >> "$GITHUB_ENV"
+          echo "compile_sdk=${COMPILE_SDK}" >> "$GITHUB_OUTPUT"
+          echo "ndk_version=${NDK_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "ndk_release=${NDK_RELEASE}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'tools platform-tools platforms;android-${{ steps.resolve-android-versions.outputs.compile_sdk }} ndk;${{ steps.resolve-android-versions.outputs.ndk_version }}'
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 11
+          java-version: 17
           cache: 'gradle'
 
       - name: Assemble samples/app
+        shell: bash
         run: |
+          export ANDROID_NDK_HOME="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
           ./gradlew -p samples/app :assembleDebug --info --warning-mode all
 
       - name: Assemble samples/library
+        shell: bash
         run: |
+          export ANDROID_NDK_HOME="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
           ./gradlew -p samples/library :assembleDebug --info --warning-mode all
 
       # Work around https://github.com/actions/cache/issues/454.
@@ -101,20 +136,54 @@ jobs:
           rustup target add x86_64-unknown-linux-gnu
           rustup target add aarch64-linux-android
 
-      # Use Java 8
-      - name: Setup Java 8
-        uses: actions/setup-java@v2
+      - id: resolve-android-versions
+        name: Resolve Android Versions
+        shell: bash
+        run: |
+          COMPILE_SDK=$(grep -E '^compile_sdk=' version.properties | head -n1 | cut -d'=' -f2-)
+          NDK_VERSION=$(grep -E '^ndk_version=' version.properties | head -n1 | cut -d'=' -f2-)
+          NDK_RELEASE=$(grep -E '^ndk_release=' version.properties | head -n1 | cut -d'=' -f2-)
+          if [ -z "$COMPILE_SDK" ]; then
+            echo "compile_sdk is missing in version.properties" >&2
+            exit 1
+          fi
+          if [ -z "$NDK_VERSION" ]; then
+            echo "ndk_version is missing in version.properties" >&2
+            exit 1
+          fi
+          if [ -z "$NDK_RELEASE" ]; then
+            echo "ndk_release is missing in version.properties" >&2
+            exit 1
+          fi
+          echo "COMPILE_SDK=${COMPILE_SDK}" >> "$GITHUB_ENV"
+          echo "NDK_VERSION=${NDK_VERSION}" >> "$GITHUB_ENV"
+          echo "NDK_RELEASE=${NDK_RELEASE}" >> "$GITHUB_ENV"
+          echo "compile_sdk=${COMPILE_SDK}" >> "$GITHUB_OUTPUT"
+          echo "ndk_version=${NDK_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "ndk_release=${NDK_RELEASE}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'tools platform-tools platforms;android-${{ steps.resolve-android-versions.outputs.compile_sdk }} ndk;${{ steps.resolve-android-versions.outputs.ndk_version }}'
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 8
+          java-version: 17
           cache: 'gradle'
 
       - name: Gradle setup
+        shell: bash
         run: |
+          export ANDROID_NDK_HOME="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
           ./gradlew -p plugin tasks --warning-mode all
 
       - name: Gradle test
+        shell: bash
         run: |
+          export ANDROID_NDK_HOME="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
           ./gradlew -p plugin test --info --warning-mode all
 
       # Work around https://github.com/actions/cache/issues/454.
@@ -140,7 +209,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup Rust
         run: |
@@ -149,20 +218,54 @@ jobs:
           rustup target add x86_64-unknown-linux-gnu
           rustup target add aarch64-linux-android
 
-      # Use Java 8
-      - name: Setup Java 8
-        uses: actions/setup-java@v2
+      - id: resolve-android-versions
+        name: Resolve Android Versions
+        shell: bash
+        run: |
+          COMPILE_SDK=$(grep -E '^compile_sdk=' version.properties | head -n1 | cut -d'=' -f2-)
+          NDK_VERSION=$(grep -E '^ndk_version=' version.properties | head -n1 | cut -d'=' -f2-)
+          NDK_RELEASE=$(grep -E '^ndk_release=' version.properties | head -n1 | cut -d'=' -f2-)
+          if [ -z "$COMPILE_SDK" ]; then
+            echo "compile_sdk is missing in version.properties" >&2
+            exit 1
+          fi
+          if [ -z "$NDK_VERSION" ]; then
+            echo "ndk_version is missing in version.properties" >&2
+            exit 1
+          fi
+          if [ -z "$NDK_RELEASE" ]; then
+            echo "ndk_release is missing in version.properties" >&2
+            exit 1
+          fi
+          echo "COMPILE_SDK=${COMPILE_SDK}" >> "$GITHUB_ENV"
+          echo "NDK_VERSION=${NDK_VERSION}" >> "$GITHUB_ENV"
+          echo "NDK_RELEASE=${NDK_RELEASE}" >> "$GITHUB_ENV"
+          echo "compile_sdk=${COMPILE_SDK}" >> "$GITHUB_OUTPUT"
+          echo "ndk_version=${NDK_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "ndk_release=${NDK_RELEASE}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'tools platform-tools platforms;android-${{ steps.resolve-android-versions.outputs.compile_sdk }} ndk;${{ steps.resolve-android-versions.outputs.ndk_version }}'
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 8
+          java-version: 17
           cache: 'gradle'
 
       - name: Gradle setup
+        shell: bash
         run: |
+          export ANDROID_NDK_HOME="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
           ./gradlew -p plugin tasks --warning-mode all
 
       - name: Gradle test
+        shell: bash
         run: |
+          export ANDROID_NDK_HOME="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
           ./gradlew -p plugin ${{ matrix.androidTestTask }} --info --warning-mode all
 
       # Work around https://github.com/actions/cache/issues/454.

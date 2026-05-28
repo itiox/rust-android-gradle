@@ -51,7 +51,7 @@ class SimpleAndroidApp {
                         }
                     }
                     dependencies {
-                        classpath ('com.android.tools.build:gradle:$androidVersion') { force = true }
+                        classpath 'com.android.tools.build:gradle:$androidVersion'
                         classpath "org.mozilla.rust-android-gradle:plugin:${Versions.PLUGIN_VERSION}"
                         ${kotlinPluginDependencyIfEnabled}
                     }
@@ -98,7 +98,7 @@ class SimpleAndroidApp {
                 include ':${library}'
             """.stripIndent()
 
-        file("${app}/build.gradle") << subprojectConfiguration("com.android.application") << """
+        file("${app}/build.gradle") << subprojectConfiguration("com.android.application", appPackage) << """
                 android.defaultConfig.applicationId "org.gradle.android.test.app"
             """.stripIndent() << activityDependency() <<
             """
@@ -107,7 +107,7 @@ class SimpleAndroidApp {
                 }
             """.stripIndent()
 
-        file("${library}/build.gradle") << subprojectConfiguration("com.android.library") << activityDependency()
+        file("${library}/build.gradle") << subprojectConfiguration("com.android.library", libPackage) << activityDependency()
 
         file("gradle.properties") << """
                 android.useAndroidX=true
@@ -124,7 +124,7 @@ class SimpleAndroidApp {
         """ : ""
     }
 
-    private subprojectConfiguration(String androidPlugin) {
+    private subprojectConfiguration(String androidPlugin, String namespacePackage) {
         """
             apply plugin: "$androidPlugin"
             ${kotlinPluginsIfEnabled}
@@ -140,6 +140,7 @@ class SimpleAndroidApp {
             }
 
             android {
+                namespace "${namespacePackage}"
                 ${maybeNdkVersion}
                 compileSdkVersion 28
                 buildToolsVersion "29.0.3"
@@ -248,10 +249,12 @@ class SimpleAndroidApp {
 
     private void configureAndroidSdkHome() {
         file('local.properties').text = ""
-        def env = System.getenv("ANDROID_HOME")
+        def env = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
         if (!env) {
             def androidSdkHome = new File("${System.getProperty("user.home")}/Library/Android/sdk")
             file('local.properties').text += "sdk.dir=${androidSdkHome.absolutePath.replace(File.separatorChar, '/' as char)}"
+        } else {
+            file('local.properties').text += "sdk.dir=${env.replace(File.separatorChar, '/' as char)}"
         }
         // def env = System.getenv("ANDROID_NDK_HOME")
         // if (!env) {
@@ -275,9 +278,9 @@ class SimpleAndroidApp {
         boolean kaptWorkersEnabled = true
 
         VersionNumber androidVersion = Versions.latestAndroidVersion()
-        VersionNumber ndkVersion = Versions.latestAndroidVersion() >= android("3.4.0") ? VersionNumber.parse("26.3.11579264") : null
+        VersionNumber ndkVersion = Versions.latestAndroidVersion() >= android("3.4.0") ? VersionNumber.parse(System.getProperty("org.gradle.android.ndkVersion")) : null
 
-        VersionNumber kotlinVersion = VersionNumber.parse("1.3.72")
+        VersionNumber kotlinVersion = VersionNumber.parse("1.9.24")
         File projectDir
         File cacheDir
 

@@ -1,9 +1,10 @@
 import groovy.json.JsonBuilder
+import org.gradle.util.GradleVersion
 import org.gradle.util.VersionNumber
 
 plugins {
-    id 'com.gradle.plugin-publish' version '0.14.0'
-    id "org.gradle.test-retry" version "1.2.0"
+    id 'com.gradle.plugin-publish' version '2.1.1'
+    id "org.gradle.test-retry" version "1.6.2"
 }
 
 apply plugin: "java-gradle-plugin"
@@ -12,30 +13,31 @@ apply plugin: "groovy"
 apply plugin: "kotlin"
 
 gradlePlugin {
+    website = 'https://github.com/mozilla/rust-android-gradle'
+    vcsUrl = 'https://github.com/mozilla/rust-android-gradle.git'
+
     plugins {
         rustAndroidGradlePlugin {
             id = 'org.mozilla.rust-android-gradle.rust-android'
             implementationClass = 'com.nishtahir.RustAndroidPlugin'
             displayName = 'Plugin for building Rust with Cargo in Android projects'
             description = 'A plugin that helps build Rust JNI libraries with Cargo for use in Android projects.'
+            tags.set(['rust', 'cargo', 'android'])
         }
     }
 }
 
-group 'org.mozilla.rust-android-gradle'
-version "$plugin_version"
+group = 'org.mozilla.rust-android-gradle'
+version = "$plugin_version"
 
 def isCI = (System.getenv('CI') ?: 'false').toBoolean()
+Properties versionProperties = new Properties()
+versionProperties.load(new FileInputStream("$rootDir/version.properties"))
+def ndkVersion = versionProperties.getProperty("ndk_version")
 
 // Maps supported Android plugin versions to the versions of Gradle that support it
 def supportedVersions = [
-    "7.0.0": ["7.1.1"],
-    "4.2.2": ["6.8.3", "7.1.1"],
-    "4.1.3": ["6.5.1", "6.8.3"],
-    "4.0.2": ["6.1.1", "6.8.3"],
-    "3.6.4": ["5.6.4", "6.8.3"],
-    "3.5.4": ["5.4.1", "5.6.4", "6.8.3"],
-    "3.1.2": ["4.10.2"]
+    "${agp_version}": [GradleVersion.current().version]
 ]
 
 // A local repo we publish our library to for testing in order to workaround limitations
@@ -51,9 +53,11 @@ publishing {
 
 dependencies {
     implementation gradleApi()
+    implementation "com.google.guava:guava:33.2.1-jre"
     compileOnly "com.android.tools.build:gradle:${agp_version}"
 
     testImplementation gradleTestKit()
+    testImplementation "com.google.guava:guava:33.2.1-jre"
     testImplementation "com.android.tools.build:gradle:${agp_version}"
     testImplementation platform("org.spockframework:spock-bom:2.0-M5-groovy-3.0")
     testImplementation("org.spockframework:spock-core") { exclude group: 'org.codehaus.groovy' }
@@ -61,19 +65,18 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-api"
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "17"
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "17"
 }
-
-pluginBundle {
-    website = 'https://github.com/mozilla/rust-android-gradle'
-    vcsUrl = 'https://github.com/mozilla/rust-android-gradle.git'
-    tags = ['rust', 'cargo', 'android']
-}
-
 
 // Generate a json file that contains the matrix of Gradle and AGP versions to test against.
 def generatedResources = "$buildDir/generated-resources/main"
@@ -116,6 +119,7 @@ tasks.register('generateTestTasksJson') {
 tasks.withType(Test).configureEach {
     dependsOn publish
     systemProperty "local.repo", localRepo.toURI()
+    systemProperty "org.gradle.android.ndkVersion", ndkVersion
     useJUnitPlatform()
     retry {
         maxRetries = isCI ? 1 : 0
@@ -152,7 +156,7 @@ static def normalizeVersion(String version) {
 }
 
 static def jdkVersionFor(String version) {
-    def jdkVersion = VersionNumber.parse(version) > VersionNumber.parse("7.0.0-alpha01") ? 11 : 8
+    def jdkVersion = VersionNumber.parse(version) >= VersionNumber.parse("8.5.0") ? 17 : 11
     
     return JavaLanguageVersion.of(jdkVersion)
 }
