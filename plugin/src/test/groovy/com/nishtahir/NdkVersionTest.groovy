@@ -7,6 +7,8 @@ import spock.lang.Unroll
 import com.nishtahir.Versions
 
 class NdkVersionTest extends AbstractTest {
+    private static final String DEFAULT_NDK_VERSION = System.getProperty("org.gradle.android.ndkVersion")
+
     @Unroll
     def "cargoBuild works with Android NDK version #ndkVersion"() {
         given:
@@ -57,8 +59,7 @@ class NdkVersionTest extends AbstractTest {
         ndkVersion << [
             // Partial list of NDK versions supported by Github Actions, per
             // https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2204-Readme.md
-            "26.3.11579264",
-            "27.2.12479018",
+            DEFAULT_NDK_VERSION,
         ]
     }
 }

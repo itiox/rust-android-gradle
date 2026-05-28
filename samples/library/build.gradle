@@ -1,9 +1,15 @@
 buildscript {
-    ext.agp_version = '7.0.0'
+    Properties versionProperties = new Properties()
+    versionProperties.load(new FileInputStream("$project.rootDir/../../version.properties"))
+
+    ext.agp_version = '8.5.0'
+    ext.compile_sdk = versionProperties.getProperty("compile_sdk")
+    ext.ndk_version = versionProperties.getProperty("ndk_version")
     repositories {
         google()
+        mavenCentral()
         maven {
-            url "https://plugins.gradle.org/m2/"
+            url = "https://plugins.gradle.org/m2/"
         }
     }
     dependencies {
@@ -16,8 +22,9 @@ apply plugin: 'com.android.library'
 apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
 
 android {
-    compileSdkVersion 27
-    ndkVersion "26.3.11579264"
+    namespace = "com.nishtahir.library"
+    compileSdkVersion Integer.parseInt(compile_sdk)
+    ndkVersion = ndk_version
 
     defaultConfig {
         minSdkVersion 21

@@ -1,9 +1,15 @@
 buildscript {
-    ext.agp_version = '4.0.1'
+    Properties versionProperties = new Properties()
+    versionProperties.load(new FileInputStream("$project.rootDir/../../version.properties"))
+
+    ext.agp_version = '8.5.0'
+    ext.compile_sdk = versionProperties.getProperty("compile_sdk")
+    ext.ndk_version = versionProperties.getProperty("ndk_version")
     repositories {
         google()
+        mavenCentral()
         maven {
-            url "https://plugins.gradle.org/m2/"
+            url = "https://plugins.gradle.org/m2/"
         }
     }
     dependencies {
@@ -16,7 +22,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
 
 android {
-    compileSdkVersion 27
+    namespace = "com.nishtahir.androidrust"
+    compileSdkVersion Integer.parseInt(compile_sdk)
     defaultConfig {
         applicationId "com.nishtahir.androidrust"
         minSdkVersion 21
@@ -31,7 +38,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    ndkVersion "22.1.7171670"
+    ndkVersion = ndk_version
     sourceSets {
         test.resources.srcDirs += "$buildDir/rustJniLibs/desktop"
     }
@@ -45,6 +52,7 @@ cargo {
 
 repositories {
     google()
+    mavenCentral()
 }
 
 

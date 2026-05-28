@@ -37,6 +37,9 @@ Cargo.lock
 gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
+.history/
+.vscode/
+.env
 
 .cargo
 **/maven-repo/
