@@ -1,6 +1,5 @@
 import groovy.json.JsonBuilder
 import org.gradle.util.GradleVersion
-import org.gradle.util.VersionNumber
 
 plugins {
     id 'com.gradle.plugin-publish' version '2.1.1'
@@ -55,6 +54,7 @@ publishing {
 dependencies {
     implementation gradleApi()
     implementation "com.google.guava:guava:33.2.1-jre"
+    implementation 'org.apache.maven:maven-artifact:3.9.6'
     compileOnly "com.android.tools.build:gradle:${agp_version}"
 
     testImplementation gradleTestKit()
@@ -157,7 +157,7 @@ static def normalizeVersion(String version) {
 }
 
 static def jdkVersionFor(String version) {
-    def jdkVersion = VersionNumber.parse(version) >= VersionNumber.parse("8.5.0") ? 17 : 11
-    
+    def jdkVersion = GradleVersion.version(version) >= GradleVersion.version("8.5.0") ? 17 : 11
+
     return JavaLanguageVersion.of(jdkVersion)
 }
