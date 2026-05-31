@@ -7,23 +7,28 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
 
-open class GenerateToolchainsTask : DefaultTask() {
+abstract class GenerateToolchainsTask : DefaultTask() {
+
+    @get:Inject
+    abstract val execOperations: ExecOperations
 
     @TaskAction
     @Suppress("unused")
     fun generateToolchainTask() {
         project.withAndroidExtension(
             application = {
-                configureTask<AppExtension>(project)
+                configureTask<AppExtension>(project, execOperations)
             },
             library = {
-                configureTask<LibraryExtension>(project)
+                configureTask<LibraryExtension>(project, execOperations)
             }
         )
     }
 
-    inline fun <reified T : BaseExtension> configureTask(project: Project) {
+    inline fun <reified T : BaseExtension> configureTask(project: Project, execOperations: ExecOperations) {
         val cargoExtension = project.extensions[CargoExtension::class]
         val app = project.extensions[T::class]
         val ndkPath = app.ndkDirectory
@@ -45,8 +50,8 @@ open class GenerateToolchainsTask : DefaultTask() {
                     // Always regenerate the toolchain, even if it exists
                     // already. It is fast to do so and fixes any issues
                     // with partially reclaimed temporary files.
-                    val dir = File(cargoExtension.toolchainDirectory, arch + "-" + apiLevel)
-                    project.exec { spec ->
+                    val dir = File(cargoExtension.toolchainDirectory, "$arch-$apiLevel")
+                    execOperations.exec { spec ->
                         spec.standardOutput = System.out
                         spec.errorOutput = System.out
                         spec.commandLine(cargoExtension.pythonCommand)

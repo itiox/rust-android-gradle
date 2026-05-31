@@ -34,6 +34,7 @@ def isCI = (System.getenv('CI') ?: 'false').toBoolean()
 Properties versionProperties = new Properties()
 versionProperties.load(new FileInputStream("$rootDir/version.properties"))
 def ndkVersion = versionProperties.getProperty("ndk_version")
+def jvmTarget = versionProperties.getProperty("jvm_target")
 
 // Maps supported Android plugin versions to the versions of Gradle that support it
 def supportedVersions = [
@@ -67,15 +68,15 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(Integer.parseInt(jvmTarget))
     }
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "17"
+    kotlinOptions.jvmTarget = jvmTarget
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "17"
+    kotlinOptions.jvmTarget = jvmTarget
 }
 
 // Generate a json file that contains the matrix of Gradle and AGP versions to test against.
