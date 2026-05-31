@@ -1,12 +1,15 @@
 package com.nishtahir
 
-import com.android.build.gradle.*
+import com.android.build.gradle.AppExtension
+import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.LibraryExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.DuplicatesStrategy
 import java.io.File
+import java.util.Locale.getDefault
 import java.util.Properties
 
 const val RUST_TASK_GROUP = "rust"
@@ -231,8 +234,8 @@ open class RustAndroidPlugin : Plugin<Project> {
         }
 
         extensions[T::class].apply {
-            sourceSets.getByName("main").jniLibs.srcDir(File("$buildDir/rustJniLibs/android"))
-            sourceSets.getByName("test").resources.srcDir(File("$buildDir/rustJniLibs/desktop"))
+            sourceSets.getByName("main").jniLibs.srcDir(File(layout.buildDirectory.asFile.get(), "rustJniLibs/android"))
+            sourceSets.getByName("test").resources.srcDir(File(layout.buildDirectory.asFile.get(), "rustJniLibs/desktop"))
         }
 
         // Determine the NDK version, if present
@@ -276,11 +279,13 @@ open class RustAndroidPlugin : Plugin<Project> {
             // From https://stackoverflow.com/a/320595.
             from(rootProject.zipTree(File(RustAndroidPlugin::class.java.protectionDomain.codeSource.location.toURI()).path))
             include("**/linker-wrapper*")
-            into(File(rootProject.buildDir, "linker-wrapper"))
+            into(File(rootProject.layout.buildDirectory.asFile.get(), "linker-wrapper"))
             eachFile {
                 it.path = it.path.replaceFirst("com/nishtahir", "")
+                it.permissions { p ->
+                    p.unix(493) // 0755 in octal, i.e. rwxr-xr-x
+                }
             }
-            fileMode = 493 // 0755 in decimal; Kotlin doesn't have octal literals (!).
             includeEmptyDirs = false
             duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         }
@@ -302,10 +307,16 @@ open class RustAndroidPlugin : Plugin<Project> {
                     }
                     .find { it.platform == target }
             if (theToolchain == null) {
-                throw GradleException("Target ${target} is not recognized (recognized targets: ${toolchains.map { it.platform }.sorted()}).  Check `local.properties` and `build.gradle`.")
+                throw GradleException("Target $target is not recognized (recognized targets: ${toolchains.map { it.platform }.sorted()}).  Check `local.properties` and `build.gradle`.")
             }
 
-            val targetBuildTask = tasks.maybeCreate("cargoBuild${target.capitalize()}",
+            val targetBuildTask = tasks.maybeCreate("cargoBuild${
+                target.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(
+                        getDefault()
+                    ) else it.toString()
+                }
+            }",
                     CargoBuildTask::class.java).apply {
                 group = RUST_TASK_GROUP
                 description = "Build library ($target)"

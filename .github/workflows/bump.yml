@@ -26,7 +26,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        old_version=$(sed -e 's/.*=//' version.properties)
+        old_version=$(grep -E '^version=' version.properties | head -n1 | cut -d'=' -f2-)
         echo "Bumping old version: $old_version to new version ${{ github.event.inputs.new_version }}."
         echo "Changelog:"
         echo "- ${{ github.event.inputs.changelog }}"
@@ -38,9 +38,8 @@ jobs:
         cat CHANGELOG.md >> new_CHANGELOG.md
         mv new_CHANGELOG.md CHANGELOG.md
 
-        sed -i -e "s/$old_version/${{ github.event.inputs.new_version }}/" version.properties README.md
-
-        echo "version=${{ github.event.inputs.new_version }}" > version.properties
+        sed -i -e "s/$old_version/${{ github.event.inputs.new_version }}/" README.md
+        sed -i -e "s/^version=.*/version=${{ github.event.inputs.new_version }}/" version.properties
 
         git diff
 

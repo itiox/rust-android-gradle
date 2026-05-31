@@ -64,7 +64,6 @@ jobs:
         run: |
           COMPILE_SDK=$(grep -E '^compile_sdk=' version.properties | head -n1 | cut -d'=' -f2-)
           NDK_VERSION=$(grep -E '^ndk_version=' version.properties | head -n1 | cut -d'=' -f2-)
-          NDK_RELEASE=$(grep -E '^ndk_release=' version.properties | head -n1 | cut -d'=' -f2-)
           if [ -z "$COMPILE_SDK" ]; then
             echo "compile_sdk is missing in version.properties" >&2
             exit 1
@@ -73,16 +72,10 @@ jobs:
             echo "ndk_version is missing in version.properties" >&2
             exit 1
           fi
-          if [ -z "$NDK_RELEASE" ]; then
-            echo "ndk_release is missing in version.properties" >&2
-            exit 1
-          fi
           echo "COMPILE_SDK=${COMPILE_SDK}" >> "$GITHUB_ENV"
           echo "NDK_VERSION=${NDK_VERSION}" >> "$GITHUB_ENV"
-          echo "NDK_RELEASE=${NDK_RELEASE}" >> "$GITHUB_ENV"
           echo "compile_sdk=${COMPILE_SDK}" >> "$GITHUB_OUTPUT"
           echo "ndk_version=${NDK_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "ndk_release=${NDK_RELEASE}" >> "$GITHUB_OUTPUT"
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
@@ -142,7 +135,6 @@ jobs:
         run: |
           COMPILE_SDK=$(grep -E '^compile_sdk=' version.properties | head -n1 | cut -d'=' -f2-)
           NDK_VERSION=$(grep -E '^ndk_version=' version.properties | head -n1 | cut -d'=' -f2-)
-          NDK_RELEASE=$(grep -E '^ndk_release=' version.properties | head -n1 | cut -d'=' -f2-)
           if [ -z "$COMPILE_SDK" ]; then
             echo "compile_sdk is missing in version.properties" >&2
             exit 1
@@ -151,16 +143,10 @@ jobs:
             echo "ndk_version is missing in version.properties" >&2
             exit 1
           fi
-          if [ -z "$NDK_RELEASE" ]; then
-            echo "ndk_release is missing in version.properties" >&2
-            exit 1
-          fi
           echo "COMPILE_SDK=${COMPILE_SDK}" >> "$GITHUB_ENV"
           echo "NDK_VERSION=${NDK_VERSION}" >> "$GITHUB_ENV"
-          echo "NDK_RELEASE=${NDK_RELEASE}" >> "$GITHUB_ENV"
           echo "compile_sdk=${COMPILE_SDK}" >> "$GITHUB_OUTPUT"
           echo "ndk_version=${NDK_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "ndk_release=${NDK_RELEASE}" >> "$GITHUB_OUTPUT"
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
@@ -224,7 +210,6 @@ jobs:
         run: |
           COMPILE_SDK=$(grep -E '^compile_sdk=' version.properties | head -n1 | cut -d'=' -f2-)
           NDK_VERSION=$(grep -E '^ndk_version=' version.properties | head -n1 | cut -d'=' -f2-)
-          NDK_RELEASE=$(grep -E '^ndk_release=' version.properties | head -n1 | cut -d'=' -f2-)
           if [ -z "$COMPILE_SDK" ]; then
             echo "compile_sdk is missing in version.properties" >&2
             exit 1
@@ -233,16 +218,10 @@ jobs:
             echo "ndk_version is missing in version.properties" >&2
             exit 1
           fi
-          if [ -z "$NDK_RELEASE" ]; then
-            echo "ndk_release is missing in version.properties" >&2
-            exit 1
-          fi
           echo "COMPILE_SDK=${COMPILE_SDK}" >> "$GITHUB_ENV"
           echo "NDK_VERSION=${NDK_VERSION}" >> "$GITHUB_ENV"
-          echo "NDK_RELEASE=${NDK_RELEASE}" >> "$GITHUB_ENV"
           echo "compile_sdk=${COMPILE_SDK}" >> "$GITHUB_OUTPUT"
           echo "ndk_version=${NDK_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "ndk_release=${NDK_RELEASE}" >> "$GITHUB_OUTPUT"
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4

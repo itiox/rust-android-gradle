@@ -2,8 +2,8 @@ buildscript {
     Properties versionProperties = new Properties()
     versionProperties.load(new FileInputStream("$project.rootDir/version.properties"))
 
-    ext.kotlin_version = '1.9.24'
-    ext.agp_version = '8.5.0'
+    ext.kotlin_version = versionProperties.getProperty("kotlin_version")
+    ext.agp_version = versionProperties.getProperty("agp_version")
     ext.plugin_version = versionProperties.getProperty("version")
 
     repositories {
