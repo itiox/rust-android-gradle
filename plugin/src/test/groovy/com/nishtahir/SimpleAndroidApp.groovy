@@ -1,20 +1,19 @@
 package com.nishtahir
 
-import org.gradle.api.GradleException
-import org.gradle.util.VersionNumber
+import org.apache.maven.artifact.versioning.ComparableVersion
 
 import static com.nishtahir.Versions.android
 
 class SimpleAndroidApp {
     final File projectDir
     private final File cacheDir
-    final VersionNumber androidVersion
-    final VersionNumber ndkVersion
-    final VersionNumber kotlinVersion
+    final ComparableVersion androidVersion
+    final ComparableVersion ndkVersion
+    final ComparableVersion kotlinVersion
     private final boolean kotlinEnabled
     private final boolean kaptWorkersEnabled
 
-    private SimpleAndroidApp(File projectDir, File cacheDir, VersionNumber androidVersion, VersionNumber ndkVersion, VersionNumber kotlinVersion, boolean kotlinEnabled, boolean kaptWorkersEnabled) {
+    private SimpleAndroidApp(File projectDir, File cacheDir, ComparableVersion androidVersion, ComparableVersion ndkVersion, ComparableVersion kotlinVersion, boolean kotlinEnabled, boolean kaptWorkersEnabled) {
         this.projectDir = projectDir
         this.cacheDir = cacheDir
         this.androidVersion = androidVersion
@@ -277,10 +276,10 @@ class SimpleAndroidApp {
         boolean kotlinEnabled = true
         boolean kaptWorkersEnabled = true
 
-        VersionNumber androidVersion = Versions.latestAndroidVersion()
-        VersionNumber ndkVersion = Versions.latestAndroidVersion() >= android("3.4.0") ? VersionNumber.parse(System.getProperty("org.gradle.android.ndkVersion")) : null
+        ComparableVersion androidVersion = Versions.latestAndroidVersion()
+        ComparableVersion ndkVersion = Versions.latestAndroidVersion() >= android("3.4.0") ? new ComparableVersion(System.getProperty("org.gradle.android.ndkVersion")) : null
 
-        VersionNumber kotlinVersion = VersionNumber.parse("1.9.24")
+        ComparableVersion kotlinVersion = new ComparableVersion("1.9.24")
         File projectDir
         File cacheDir
 
@@ -294,17 +293,8 @@ class SimpleAndroidApp {
             return this
         }
 
-        Builder withKotlinVersion(VersionNumber kotlinVersion) {
-            this.kotlinVersion = kotlinVersion
-            return this
-        }
 
-        Builder withKaptWorkersDisabled() {
-            this.kaptWorkersEnabled = false
-            return this
-        }
-
-        Builder withAndroidVersion(VersionNumber androidVersion) {
+        Builder withAndroidVersion(ComparableVersion androidVersion) {
             this.androidVersion = androidVersion
             if (this.androidVersion < android("3.4.0")) {
                 this.ndkVersion = null
@@ -316,23 +306,13 @@ class SimpleAndroidApp {
             return withAndroidVersion(android(androidVersion))
         }
 
-        Builder withNdkVersion(VersionNumber ndkVersion) {
+        Builder withNdkVersion(ComparableVersion ndkVersion) {
             this.ndkVersion = ndkVersion
             return this
         }
 
         Builder withNdkVersion(String ndkVersion) {
-            return withNdkVersion(VersionNumber.parse(ndkVersion))
-        }
-
-        Builder withProjectDir(File projectDir) {
-            this.projectDir = projectDir
-            return this
-        }
-
-        Builder withCacheDir(File cacheDir) {
-            this.cacheDir = cacheDir
-            return this
+            return withNdkVersion(new ComparableVersion(ndkVersion))
         }
 
         SimpleAndroidApp build() {

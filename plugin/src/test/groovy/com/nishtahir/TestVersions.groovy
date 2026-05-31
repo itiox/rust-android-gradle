@@ -2,24 +2,24 @@ package com.nishtahir
 
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
+import org.apache.maven.artifact.versioning.ComparableVersion
 import org.gradle.util.GradleVersion
-import org.gradle.util.VersionNumber
 
 
 class TestVersions {
-    static Multimap<VersionNumber, GradleVersion> getAllCandidateTestVersions() {
+    static Multimap<ComparableVersion, GradleVersion> getAllCandidateTestVersions() {
         def testedVersion = System.getProperty('org.gradle.android.testVersion')
         if (testedVersion) {
-            return ImmutableMultimap.copyOf(Versions.SUPPORTED_VERSIONS_MATRIX.entries().findAll {it.key == VersionNumber.parse(testedVersion) })
+            return ImmutableMultimap.copyOf(Versions.SUPPORTED_VERSIONS_MATRIX.entries().findAll {it.key == new ComparableVersion(testedVersion) })
         } else {
             return Versions.SUPPORTED_VERSIONS_MATRIX
         }
     }
 
-    static VersionNumber latestAndroidVersionForCurrentJDK() {
+    static ComparableVersion latestAndroidVersionForCurrentJDK() {
         String currentJDKVersion = System.getProperty("java.version");
         if (currentJDKVersion.startsWith("1.")) {
-            return allCandidateTestVersions.keySet().findAll {it < VersionNumber.parse("7.0.0-alpha01")}.max()
+            return allCandidateTestVersions.keySet().findAll {it < new ComparableVersion("7.0.0-alpha01")}.max()
         }
         return allCandidateTestVersions.keySet().max()
     }
@@ -29,20 +29,20 @@ class TestVersions {
     }
 
     static GradleVersion latestSupportedGradleVersionFor(String androidVersion) {
-        return latestSupportedGradleVersionFor(VersionNumber.parse(androidVersion))
+        return latestSupportedGradleVersionFor(new ComparableVersion(androidVersion))
     }
 
-    static GradleVersion latestSupportedGradleVersionFor(VersionNumber androidVersion) {
-        return allCandidateTestVersions.asMap().find {it.key.major == androidVersion.major && it.key.minor == androidVersion.minor }?.value?.max()
+    static GradleVersion latestSupportedGradleVersionFor(ComparableVersion androidVersion) {
+        return allCandidateTestVersions.asMap().find { Versions.majorMinor(it.key) == Versions.majorMinor(androidVersion) }?.value?.max()
     }
 
-    static VersionNumber getLatestVersionForAndroid(String version) {
-        VersionNumber versionNumber = VersionNumber.parse(version)
-        return allCandidateTestVersions.keySet().findAll { it.major == versionNumber.major && it.minor == versionNumber.minor }?.max()
+    static ComparableVersion getLatestVersionForAndroid(String version) {
+        ComparableVersion versionNumber = new ComparableVersion(version)
+        return allCandidateTestVersions.keySet().findAll { Versions.majorMinor(it) == Versions.majorMinor(versionNumber) }?.max()
     }
 
-    static List<VersionNumber> getLatestAndroidVersions() {
-        def minorVersions = allCandidateTestVersions.keySet().collect { "${it.major}.${it.minor}" }
+    static List<ComparableVersion> getLatestAndroidVersions() {
+        def minorVersions = allCandidateTestVersions.keySet().collect { Versions.majorMinor(it) }
         return minorVersions.collect { getLatestVersionForAndroid(it) }
     }
 }
