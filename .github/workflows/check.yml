@@ -92,13 +92,13 @@ jobs:
       - name: Assemble samples/app
         shell: bash
         run: |
-          export ANDROID_NDK_HOME="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
+          export ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
           ./gradlew -p samples/app :assembleDebug --info --warning-mode all
 
       - name: Assemble samples/library
         shell: bash
         run: |
-          export ANDROID_NDK_HOME="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
+          export ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
           ./gradlew -p samples/library :assembleDebug --info --warning-mode all
 
       # Work around https://github.com/actions/cache/issues/454.
@@ -163,13 +163,13 @@ jobs:
       - name: Gradle setup
         shell: bash
         run: |
-          export ANDROID_NDK_HOME="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
+          export ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
           ./gradlew -p plugin tasks --warning-mode all
 
       - name: Gradle test
         shell: bash
         run: |
-          export ANDROID_NDK_HOME="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
+          export ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
           ./gradlew -p plugin test --info --warning-mode all
 
       # Work around https://github.com/actions/cache/issues/454.
@@ -238,13 +238,13 @@ jobs:
       - name: Gradle setup
         shell: bash
         run: |
-          export ANDROID_NDK_HOME="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
+          export ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
           ./gradlew -p plugin tasks --warning-mode all
 
       - name: Gradle test
         shell: bash
         run: |
-          export ANDROID_NDK_HOME="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
+          export ANDROID_NDK_ROOT="${ANDROID_SDK_ROOT}/ndk/${{ steps.resolve-android-versions.outputs.ndk_version }}"
           ./gradlew -p plugin ${{ matrix.androidTestTask }} --info --warning-mode all
 
       # Work around https://github.com/actions/cache/issues/454.
