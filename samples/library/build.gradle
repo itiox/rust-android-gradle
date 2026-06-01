@@ -5,6 +5,7 @@ buildscript {
     ext.agp_version = versionProperties.getProperty("agp_version")
     ext.compile_sdk = versionProperties.getProperty("compile_sdk")
     ext.ndk_version = versionProperties.getProperty("ndk_version")
+    ext.kotlin_version = versionProperties.getProperty("kotlin_version")
     repositories {
         google()
         mavenCentral()
@@ -14,6 +15,7 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$agp_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'org.mozilla.rust-android-gradle:rust-android:+'
     }
 }
