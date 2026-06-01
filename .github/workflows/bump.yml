@@ -15,9 +15,11 @@ on:
 jobs:
   bump-version:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
 
     # Everything here was cribbed from or inspired by
     # https://github.com/oflynned/android-version-bump/blob/b9f6de7f8bdf25de3f695843265debf7c3919272.
@@ -26,6 +28,12 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        new_tag="v${{ github.event.inputs.new_version }}"
+        if git ls-remote --tags origin "refs/tags/${new_tag}" | grep -q "refs/tags/${new_tag}$"; then
+          echo "Tag ${new_tag} already exists on origin. Aborting bump workflow." >&2
+          exit 1
+        fi
+
         old_version=$(grep -E '^version=' version.properties | head -n1 | cut -d'=' -f2-)
         echo "Bumping old version: $old_version to new version ${{ github.event.inputs.new_version }}."
         echo "Changelog:"
@@ -51,22 +59,20 @@ jobs:
 
         git log -n 1
 
-        git tag "v${{ github.event.inputs.new_version }}"
+        git tag "${new_tag}"
         remote="https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 
         git push "${remote}" --follow-tags
         git push "${remote}" --tags
 
-        echo "::set-output name=new_tag::v${{ github.event.inputs.new_version }}"
+        echo "new_tag=${new_tag}" >> "$GITHUB_OUTPUT"
 
     - name: Create release
       id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ steps.bump_version.outputs.new_tag }}
-        release_name: ${{ steps.bump_version.outputs.new_tag }}
+        name: ${{ steps.bump_version.outputs.new_tag }}
         body: "- ${{ github.event.inputs.changelog }}"
         prerelease: false
         draft: true
