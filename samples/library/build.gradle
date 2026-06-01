@@ -50,12 +50,6 @@ cargo {
     targets = ["x86_64", "arm64"]
     libname = "rust"
 
-    features {
-        defaultAnd "foo", "bar"
-        noDefaultBut("foo", "bar")
-        all()
-    }
-
     exec = { spec, toolchain ->
         spec.environment("TEST", "test")
     }
