@@ -6,12 +6,6 @@ import groovy.transform.TypeCheckingMode
 import org.apache.maven.artifact.versioning.ComparableVersion
 import org.gradle.util.GradleVersion
 
-import java.util.Collections
-import java.util.Map
-import java.util.SortedSet
-import java.util.TreeMap
-import java.util.TreeSet
-
 @CompileStatic(TypeCheckingMode.SKIP)
 class Versions {
     static final ComparableVersion PLUGIN_VERSION;
