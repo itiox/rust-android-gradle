@@ -20,19 +20,11 @@ class TestVersions {
     }
 
     static ComparableVersion latestAndroidVersionForCurrentJDK() {
-        String currentJDKVersion = System.getProperty("java.version");
+        String currentJDKVersion = System.getProperty("java.version")
         if (currentJDKVersion.startsWith("1.")) {
             return allCandidateTestVersions.keySet().findAll {it < new ComparableVersion("7.0.0-alpha01")}.max()
         }
         return allCandidateTestVersions.keySet().max()
-    }
-
-    static GradleVersion latestGradleVersion() {
-        return allCandidateTestVersions.values().flatten().max() as GradleVersion
-    }
-
-    static GradleVersion latestSupportedGradleVersionFor(String androidVersion) {
-        return latestSupportedGradleVersionFor(new ComparableVersion(androidVersion))
     }
 
     static GradleVersion latestSupportedGradleVersionFor(ComparableVersion androidVersion) {

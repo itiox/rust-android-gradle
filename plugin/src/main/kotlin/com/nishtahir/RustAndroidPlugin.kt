@@ -86,7 +86,7 @@ val toolchains = listOf(
                 "android/x86_64"),
         Toolchain("arm",
                 ToolchainType.ANDROID_PREBUILT,
-                "armv7-linux-androideabi",  // This is correct.  "Note: For 32-bit ARM, the compiler is prefixed with
+                "armv7-linux-androideabi",  // This is correct. Note: For 32-bit ARM, the compiler is prefixed with
                 "armv7a-linux-androideabi", // armv7a-linux-androideabi, but the binutils tools are prefixed with
                 "arm-linux-androideabi",    // arm-linux-androideabi. For other architectures, the prefixes are the same
                 "android/armeabi-v7a"),     // for all tools."  (Ref: https://developer.android.com/ndk/guides/other_build_systems#overview )
@@ -215,21 +215,17 @@ open class RustAndroidPlugin : Plugin<Project> {
 
         // Ensure that an API level is specified for all targets
         val apiLevel = cargoExtension.apiLevel
-        if (cargoExtension.apiLevels.size > 0) {
+        if (cargoExtension.apiLevels.isNotEmpty()) {
             if (apiLevel != null) {
                 throw GradleException("Cannot set both `apiLevel` and `apiLevels`")
             }
         } else {
-            val default = if (apiLevel != null) {
-                apiLevel
-            } else {
-                extensions[T::class].defaultConfig.minSdkVersion!!.apiLevel
-            }
-            cargoExtension.apiLevels = cargoExtension.targets!!.map { it to default }.toMap()
+            val default = apiLevel ?: extensions[T::class].defaultConfig.minSdkVersion!!.apiLevel
+            cargoExtension.apiLevels = cargoExtension.targets!!.associateWith { default }
         }
         val missingApiLevelTargets = cargoExtension.targets!!.toSet().minus(
             cargoExtension.apiLevels.keys)
-        if (missingApiLevelTargets.size > 0) {
+        if (missingApiLevelTargets.isNotEmpty()) {
             throw GradleException("`apiLevels` missing entries for: $missingApiLevelTargets")
         }
 
@@ -253,7 +249,7 @@ open class RustAndroidPlugin : Plugin<Project> {
         val usePrebuilt =
             cargoExtension.localProperties.getProperty("rust.prebuiltToolchains")?.equals("true") ?:
             cargoExtension.prebuiltToolchains ?:
-            (ndk.versionMajor >= 19);
+            (ndk.versionMajor >= 19)
 
         if (usePrebuilt && ndk.versionMajor < 19) {
             throw GradleException("usePrebuilt = true requires NDK version 19+")

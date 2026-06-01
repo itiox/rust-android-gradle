@@ -44,7 +44,7 @@ abstract class GenerateToolchainsTask : DefaultTask() {
                      val apiLevel = cargoExtension.apiLevels[arch]!!
 
                      if (arch.endsWith("64") && apiLevel < 21) {
-                        throw GradleException("Can't target 64-bit ${arch} with API level < 21 (${apiLevel})")
+                        throw GradleException("Can't target 64-bit $arch with API level < 21 (${apiLevel})")
                     }
 
                     // Always regenerate the toolchain, even if it exists
