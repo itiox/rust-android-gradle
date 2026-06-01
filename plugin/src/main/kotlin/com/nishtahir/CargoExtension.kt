@@ -1,32 +1,19 @@
 package com.nishtahir
 
-import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.process.ExecSpec
 import java.io.File
 import java.util.Properties
 
 sealed class Features {
-    class All() : Features()
+    class All : Features()
 
     data class DefaultAnd(val featureSet: Set<String>) : Features()
 
     data class NoDefaultBut(val featureSet: Set<String>) : Features()
 }
 
-data class FeatureSpec(var features: Features? = null) {
-    fun all() {
-        this.features = Features.All()
-    }
-
-    fun defaultAnd(featureSet: Array<String>) {
-        this.features = Features.DefaultAnd(featureSet.toSet())
-    }
-
-    fun noDefaultBut(featureSet: Array<String>) {
-        this.features = Features.NoDefaultBut(featureSet.toSet())
-    }
-}
+data class FeatureSpec(var features: Features? = null)
 
 // `CargoExtension` is documented in README.md.
 open class CargoExtension {
@@ -52,10 +39,6 @@ open class CargoExtension {
 
     var featureSpec: FeatureSpec = FeatureSpec()
 
-    fun features(action: Action<FeatureSpec>) {
-        action.execute(featureSpec)
-    }
-
     val toolchainDirectory: File
         get() {
             // Share a single toolchain directory, if one is configured.  Prefer "local.properties"
@@ -70,7 +53,7 @@ open class CargoExtension {
                 return File(globalDir).absoluteFile
             }
 
-            var defaultDir = File(System.getProperty("java.io.tmpdir"), "rust-android-ndk-toolchains")
+            val defaultDir = File(System.getProperty("java.io.tmpdir"), "rust-android-ndk-toolchains")
             return defaultDir.absoluteFile
         }
 

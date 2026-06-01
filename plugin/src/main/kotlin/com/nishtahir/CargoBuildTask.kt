@@ -1,4 +1,4 @@
-package com.nishtahir;
+package com.nishtahir
 
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.DefaultTask
@@ -28,10 +28,7 @@ abstract class CargoBuildTask : DefaultTask() {
     fun build() = with(project) {
         extensions[CargoExtension::class].apply {
             // Need to capture the value to dereference smoothly.
-            val toolchain = toolchain
-            if (toolchain == null) {
-                throw GradleException("toolchain cannot be null")
-            }
+            val toolchain = toolchain ?: throw GradleException("toolchain cannot be null")
 
             val ndk = ndk ?: throw GradleException("ndk cannot be null")
 
@@ -98,10 +95,10 @@ abstract class CargoBuildTask : DefaultTask() {
             with(spec) {
                 standardOutput = System.out
                 val module = File(cargoExtension.module!!)
-                if (module.isAbsolute) {
-                    workingDir = module
+                workingDir = if (module.isAbsolute) {
+                    module
                 } else {
-                    workingDir = File(project.project.projectDir, module.path)
+                    File(project.project.projectDir, module.path)
                 }
                 workingDir = workingDir.canonicalFile
 
@@ -116,19 +113,18 @@ abstract class CargoBuildTask : DefaultTask() {
 
                 theCommandLine.add("build")
 
-                // Respect `verbose` if it is set; otherwise, log if asked to
+                // Respect `verbose` if it is set; otherwise, log if asked
                 // with `--info` or `--debug` from the command line.
                 if (cargoExtension.verbose ?: project.logger.isEnabled(LogLevel.INFO)) {
                     theCommandLine.add("--verbose")
                 }
 
-                val features = cargoExtension.featureSpec.features
                 // We just pass this along to cargo as something space separated... AFAICT
                 // you're allowed to have featureSpec with spaces in them, but I don't think
                 // there's a way to specify them in the cargo command line -- rustc accepts
                 // them if passed in directly with `--cfg`, and cargo will pass them to rustc
                 // if you use them as default featureSpec.
-                when (features) {
+                when (val features = cargoExtension.featureSpec.features) {
                     null -> Unit
                     is Features.All -> {
                         theCommandLine.add("--all-features")
@@ -213,9 +209,9 @@ abstract class CargoBuildTask : DefaultTask() {
                     }
                     environment("CARGO_TARGET_${toolchainTarget}_LINKER", linkerWrapper.path)
 
-                    val cc = File(toolchainDirectory, "${toolchain.cc(apiLevel)}").path;
-                    val cxx = File(toolchainDirectory, "${toolchain.cxx(apiLevel)}").path;
-                    val ar = File(toolchainDirectory, "${toolchain.ar(apiLevel, ndkVersionMajor)}").path;
+                    val cc = File(toolchainDirectory, "${toolchain.cc(apiLevel)}").path
+                    val cxx = File(toolchainDirectory, "${toolchain.cxx(apiLevel)}").path
+                    val ar = File(toolchainDirectory, "${toolchain.ar(apiLevel, ndkVersionMajor)}").path
 
                     // For build.rs in `cc` consumers: like "CC_i686-linux-android".  See
                     // https://github.com/alexcrichton/cc-rs#external-configuration-via-environment-variables.

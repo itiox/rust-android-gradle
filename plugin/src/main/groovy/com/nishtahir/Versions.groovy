@@ -8,7 +8,7 @@ import org.gradle.util.GradleVersion
 
 @CompileStatic(TypeCheckingMode.SKIP)
 class Versions {
-    static final ComparableVersion PLUGIN_VERSION;
+    static final ComparableVersion PLUGIN_VERSION
     static final SortedSet<GradleVersion> SUPPORTED_GRADLE_VERSIONS
     static final SortedSet<ComparableVersion> SUPPORTED_ANDROID_VERSIONS
     static final Map<ComparableVersion, SortedSet<GradleVersion>> SUPPORTED_VERSIONS_MATRIX

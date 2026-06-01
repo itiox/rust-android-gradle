@@ -4,8 +4,6 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import spock.lang.Unroll
 
-import com.nishtahir.Versions
-
 class NdkVersionTest extends AbstractTest {
     private static final String DEFAULT_NDK_VERSION = System.getProperty("org.gradle.android.ndkVersion")
 
