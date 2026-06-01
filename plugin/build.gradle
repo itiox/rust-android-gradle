@@ -36,13 +36,14 @@ def ndkVersion = versionProperties.getProperty("ndk_version")
 def jvmTarget = versionProperties.getProperty("jvm_target")
 
 // Maps supported Android plugin versions to the versions of Gradle that support it
+def agpVersionKey = agp_version.toString()
 def supportedVersions = [
-    "${agp_version}": [GradleVersion.current().version]
+    (agpVersionKey): [GradleVersion.current().version]
 ]
 
 // A local repo we publish our library to for testing in order to workaround limitations
 // in the TestKit plugin classpath.
-def localRepo = file("$buildDir/local-repo")
+def localRepo = layout.buildDirectory.dir("local-repo").get().asFile
 publishing {
     repositories {
         maven {
@@ -53,12 +54,10 @@ publishing {
 
 dependencies {
     implementation gradleApi()
-    implementation "com.google.guava:guava:33.2.1-jre"
     implementation 'org.apache.maven:maven-artifact:3.9.6'
     compileOnly "com.android.tools.build:gradle:${agp_version}"
 
     testImplementation gradleTestKit()
-    testImplementation "com.google.guava:guava:33.2.1-jre"
     testImplementation "com.android.tools.build:gradle:${agp_version}"
     testImplementation platform("org.spockframework:spock-bom:2.0-M5-groovy-3.0")
     testImplementation("org.spockframework:spock-core") { exclude group: 'org.codehaus.groovy' }
@@ -80,9 +79,9 @@ compileTestKotlin {
 }
 
 // Generate a json file that contains the matrix of Gradle and AGP versions to test against.
-def generatedResources = "$buildDir/generated-resources/main"
+def generatedResources = layout.buildDirectory.dir("generated-resources/main").get().asFile
 tasks.register('generateVersions') {
-    def outputFile = file("$generatedResources/versions.json")
+    def outputFile = file(new File(generatedResources, "versions.json"))
     inputs.property "version", version
     inputs.property "supportedVersions", supportedVersions
     outputs.dir generatedResources
@@ -101,9 +100,9 @@ sourceSets {
 }
 
 // This is used by github actions to split out jobs by Android version test task
-def generatedBuildResources = "$buildDir/build-resources"
+def generatedBuildResources = layout.buildDirectory.dir("build-resources").get().asFile
 tasks.register('generateTestTasksJson') {
-    def outputFile = file("${generatedBuildResources}/androidTestTasks.json")
+    def outputFile = file(new File(generatedBuildResources, "androidTestTasks.json"))
     inputs.property "supportedVersions", supportedVersions
     outputs.dir generatedBuildResources
     doLast {

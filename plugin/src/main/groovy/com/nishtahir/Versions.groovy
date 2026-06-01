@@ -1,34 +1,45 @@
 package com.nishtahir
 
-import com.google.common.collect.ImmutableMultimap
-import com.google.common.collect.ImmutableSortedSet
-import com.google.common.collect.Multimap
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.apache.maven.artifact.versioning.ComparableVersion
 import org.gradle.util.GradleVersion
 
+import java.util.Collections
+import java.util.Map
+import java.util.SortedSet
+import java.util.TreeMap
+import java.util.TreeSet
+
 @CompileStatic(TypeCheckingMode.SKIP)
 class Versions {
     static final ComparableVersion PLUGIN_VERSION;
-    static final Set<GradleVersion> SUPPORTED_GRADLE_VERSIONS
-    static final Set<ComparableVersion> SUPPORTED_ANDROID_VERSIONS
-    static final Multimap<ComparableVersion, GradleVersion> SUPPORTED_VERSIONS_MATRIX
+    static final SortedSet<GradleVersion> SUPPORTED_GRADLE_VERSIONS
+    static final SortedSet<ComparableVersion> SUPPORTED_ANDROID_VERSIONS
+    static final Map<ComparableVersion, SortedSet<GradleVersion>> SUPPORTED_VERSIONS_MATRIX
 
     static {
         def versions = new JsonSlurper().parse(Versions.classLoader.getResource("versions.json"))
         PLUGIN_VERSION = new ComparableVersion(versions.version)
 
-        def builder = ImmutableMultimap.<ComparableVersion, GradleVersion>builder()
+        def matrix = new TreeMap<ComparableVersion, SortedSet<GradleVersion>>()
         versions.supportedVersions.each { String androidVersion, List<String> gradleVersions ->
-            builder.putAll(android(androidVersion), gradleVersions.collect { gradle(it) })
+            def androidVersionKey = android(androidVersion)
+            def gradleVersionSet = matrix.computeIfAbsent(androidVersionKey) { new TreeSet<GradleVersion>() }
+            gradleVersionSet.addAll(gradleVersions.collect { gradle(it) })
         }
-        def matrix = builder.build()
+        def immutableMatrix = Collections.unmodifiableMap(
+                matrix.collectEntries { version, gradleVersions ->
+                    [(version): Collections.unmodifiableSortedSet(new TreeSet<GradleVersion>(gradleVersions))]
+                } as Map<ComparableVersion, SortedSet<GradleVersion>>)
 
-        SUPPORTED_VERSIONS_MATRIX = matrix
-        SUPPORTED_ANDROID_VERSIONS = ImmutableSortedSet.copyOf(matrix.keySet())
-        SUPPORTED_GRADLE_VERSIONS = ImmutableSortedSet.copyOf(matrix.values())
+        SUPPORTED_VERSIONS_MATRIX = immutableMatrix
+        SUPPORTED_ANDROID_VERSIONS = Collections.unmodifiableSortedSet(new TreeSet<ComparableVersion>(immutableMatrix.keySet()))
+
+        def allGradleVersions = new TreeSet<GradleVersion>()
+        immutableMatrix.values().each { allGradleVersions.addAll(it) }
+        SUPPORTED_GRADLE_VERSIONS = Collections.unmodifiableSortedSet(allGradleVersions)
     }
 
     static ComparableVersion android(String version) {
