@@ -130,7 +130,7 @@ tasks.withType(Test).configureEach {
 // Generate a test task for each Android version and run the tests annotated with the MultiVersionTest category
 supportedVersions.keySet().each { androidVersion ->
     def testTaskName = androidTestTaskName(androidVersion)
-    def jdkVersion = jdkVersionFor(androidVersion)
+    def jdkVersion = JavaLanguageVersion.of(Integer.parseInt(jvmTarget))
     def versionSpecificTest = tasks.register(testTaskName, Test) {
         description = "Runs the multi-version tests for AGP ${androidVersion} (JDK version ${jdkVersion})"
         group = "verification"
@@ -153,10 +153,4 @@ static def androidTestTaskName(String androidVersion) {
 
 static def normalizeVersion(String version) {
     return version.replaceAll('[.\\-]', '_')
-}
-
-static def jdkVersionFor(String version) {
-    def jdkVersion = GradleVersion.version(version) >= GradleVersion.version("8.5.0") ? 17 : 11
-
-    return JavaLanguageVersion.of(jdkVersion)
 }
