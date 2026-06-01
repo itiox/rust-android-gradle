@@ -5,6 +5,7 @@ buildscript {
     ext.agp_version = versionProperties.getProperty("agp_version")
     ext.compile_sdk = versionProperties.getProperty("compile_sdk")
     ext.ndk_version = versionProperties.getProperty("ndk_version")
+    ext.plugin_version = versionProperties.getProperty("version")
     repositories {
         google()
         mavenCentral()
@@ -14,7 +15,7 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:${agp_version}"
-        classpath 'org.mozilla.rust-android-gradle:rust-android:+'
+        classpath "org.mozilla.rust-android-gradle:rust-android:$plugin_version"
     }
 }
 
