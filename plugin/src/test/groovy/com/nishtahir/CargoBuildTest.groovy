@@ -44,6 +44,8 @@ class CargoBuildTest extends AbstractTest {
         new File(temporaryFolder.root, "library/build/rustJniLibs/android/x86_64/librust.so").exists()
 
         where:
-        [androidVersion, gradleVersion] << TestVersions.allCandidateTestVersions.entries().collect { [it.key, it.value] }
+        [androidVersion, gradleVersion] << TestVersions.allCandidateTestVersions.collectMany { androidVersion, gradleVersions ->
+            gradleVersions.collect { [androidVersion, it] }
+        }
     }
 }
