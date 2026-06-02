@@ -1,15 +1,15 @@
 # Community Participation Guidelines
 
-This repository is governed by Mozilla's code of conduct and etiquette guidelines. 
+This repository follows the Contributor Covenant Code of Conduct.
 For more details, please read the
-[Mozilla Community Participation Guidelines](https://www.mozilla.org/about/governance/policies/participation/). 
+[Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
 
 ## How to Report
-For more information on how to report violations of the Community Participation Guidelines, please read our '[How to Report](https://www.mozilla.org/about/governance/policies/participation/reporting/)' page.
+To report unacceptable behavior, please open an issue in this repository or contact the maintainers directly.
 
 <!--
 ## Project Specific Etiquette
 
-In some cases, there will be additional project etiquette i.e.: (https://bugzilla.mozilla.org/page.cgi?id=etiquette.html).
+In some cases, there will be additional project etiquette.
 Please update for your project.
 -->
