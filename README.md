@@ -4,8 +4,8 @@ Cross compile Rust Cargo projects for Android targets.
 
 
 <p align="left">
-    <a alt="Version badge" href="https://plugins.gradle.org/plugin/org.mozilla.rust-android-gradle.rust-android">
-        <img src="https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/org/mozilla/rust-android-gradle/rust-android/org.mozilla.rust-android-gradle.rust-android.gradle.plugin/maven-metadata.xml.svg?label=rust-android-gradle&colorB=brightgreen" /></a>
+    <a alt="Version badge" href="https://plugins.gradle.org/plugin/com.itiox.rust-android-gradle.rust-android">
+        <img src="https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/com/itiox/rust-android-gradle/rust-android/com.itiox.rust-android-gradle.rust-android.gradle.plugin/maven-metadata.xml.svg?label=rust-android-gradle&colorB=brightgreen" /></a>
 </p>
 
 # Usage
@@ -20,7 +20,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'org.mozilla.rust-android-gradle:plugin:0.9.7'
+        classpath 'com.itiox.rust-android-gradle:plugin:0.9.6'
     }
 }
 ```
@@ -33,7 +33,7 @@ buildscript {
 }
 
 plugins {
-    id "org.mozilla.rust-android-gradle.rust-android" version "0.9.7"
+    id "com.itiox.rust-android-gradle.rust-android" version "0.9.6"
 }
 ```
 
@@ -42,7 +42,7 @@ In your *project's* build.gradle, `apply plugin` and add the `cargo` configurati
 ```groovy
 android { ... }
 
-apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
+apply plugin: 'com.itiox.rust-android-gradle.rust-android'
 
 cargo {
     module  = "../rust"       // Or whatever directory contains your Cargo.toml
@@ -495,9 +495,9 @@ under `build/local-repo`:
 ```
 $ ./gradlew publish
 ...
-$ ls -al build/local-repo/org/mozilla/rust-android-gradle/org.mozilla.rust-android-gradle.gradle.plugin/0.4.0/org.mozilla.rust-android-gradle.gradle.plugin-0.4.0.pom
+$ ls -al build/local-repo/com/itiox/rust-android-gradle/com.itiox.rust-android-gradle.gradle.plugin/0.4.0/com.itiox.rust-android-gradle.gradle.plugin-0.4.0.pom
 -rw-r--r--  1 nalexander  staff  670 18 Sep 10:09
-build/local-repo/org/mozilla/rust-android-gradle/org.mozilla.rust-android-gradle.gradle.plugin/0.4.0/org.mozilla.rust-android-gradle.gradle.plugin-0.4.0.pom
+build/local-repo/com/itiox/rust-android-gradle/com.itiox.rust-android-gradle.gradle.plugin/0.4.0/com.itiox.rust-android-gradle.gradle.plugin-0.4.0.pom
 ```
 
 ## Sample projects
@@ -529,7 +529,7 @@ An easy way to locally test changes made in this plugin is to simply add this to
 includeBuild('../rust-android-gradle') {
     dependencySubstitution {
         // As required.
-        substitute module('gradle.plugin.org.mozilla.rust-android-gradle:plugin') with project(':plugin')
+        substitute module('gradle.plugin.com.itiox.rust-android-gradle:plugin') with project(':plugin')
     }
 }
 ```
@@ -539,15 +539,15 @@ includeBuild('../rust-android-gradle') {
 ## Automatically via the Bump version Github Actions workflow
 
 You will need to be a collaborator.  First, manually invoke the [Bump version Github Actions
-workflow](https://github.com/mozilla/rust-android-gradle/actions/workflows/bump.yml).  Specify a
+workflow](https://github.com/itiox/rust-android-gradle/actions/workflows/bump.yml).  Specify a
 version (like "x.y.z", without quotes) and a single line changelog entry.  (This entry will have a
 dash prepended, so that it would look normal in a list.  This is working around [the lack of a
 multi-line input in Github
 Actions](https://github.community/t/multiline-inputs-for-workflow-dispatch/163906).)  This will push
 a preparatory commit updating version numbers and the changelog like [this
-one](https://github.com/mozilla/rust-android-gradle/commit/2a637d1797a5d0b5063b8d2f0a3d4a4938511154),
+one](https://github.com/itiox/rust-android-gradle/commit/2a637d1797a5d0b5063b8d2f0a3d4a4938511154),
 and make a **draft** Github Release with a name like `vx.y.z`.  After verifying that tests pass,
-navigate to [the releases panel](https://github.com/mozilla/rust-android-gradle/releases) and edit
+navigate to [the releases panel](https://github.com/itiox/rust-android-gradle/releases) and edit
 the release, finally pressing "Publish release".  The release Github workflow will build and publish
 the plugin, although it may take some days for it to be reflected on the Gradle plugin portal.
 
@@ -562,12 +562,12 @@ At top-level, the `publishPlugins` Gradle task publishes the plugin for consumpt
 ```
 $ ./gradlew publishPlugins
 ...
-Publishing plugin org.mozilla.rust-android-gradle.rust-android version 0.8.1
+Publishing plugin com.itiox.rust-android-gradle.rust-android version 0.8.1
 Publishing artifact build/libs/plugin-0.8.1.jar
 Publishing artifact build/libs/plugin-0.8.1-sources.jar
 Publishing artifact build/libs/plugin-0.8.1-javadoc.jar
 Publishing artifact build/publish-generated-resources/pom.xml
-Activating plugin org.mozilla.rust-android-gradle.rust-android version 0.8.1
+Activating plugin com.itiox.rust-android-gradle.rust-android version 0.8.1
 ```
 
 ## Real projects
@@ -578,12 +578,12 @@ To test in a real project, use the local Maven repository in your `build.gradle`
 buildscript {
     repositories {
         maven {
-            url "file:///Users/nalexander/Mozilla/rust-android-gradle/build/local-repo"
+            url "file:///Users/itiox/rust-android-gradle/build/local-repo"
         }
     }
 
     dependencies {
-        classpath 'org.mozilla.rust-android-gradle:plugin:0.9.0'
+        classpath 'com.itiox.rust-android-gradle:plugin:0.9.0'
     }
 }
 ```

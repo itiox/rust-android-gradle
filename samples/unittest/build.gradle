@@ -15,12 +15,12 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:${agp_version}"
-        classpath "org.mozilla.rust-android-gradle:rust-android:$plugin_version"
+        classpath "com.itiox.rust-android-gradle:rust-android:$plugin_version"
     }
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
+apply plugin: 'com.itiox.rust-android-gradle.rust-android'
 
 android {
     namespace = "com.nishtahir.androidrust"
