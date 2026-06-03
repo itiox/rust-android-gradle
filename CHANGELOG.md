@@ -1,3 +1,7 @@
+# 0.9.8
+
+- Fix plugin publishing coordinates for com.itiox ownership
+
 # 0.9.7
 
 - Forked plugin published with updated gradle and java versions
