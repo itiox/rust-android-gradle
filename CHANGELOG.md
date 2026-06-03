@@ -1,3 +1,7 @@
+# 0.9.7
+
+- Forked plugin published with updated gradle and java versions
+
 # 0.9.6
 
 - Added option to add a build-id during linking
