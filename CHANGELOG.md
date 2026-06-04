@@ -1,3 +1,7 @@
+# 0.9.10
+
+- Updated to minimum LTS deps
+
 # 0.9.8
 
 - Fix plugin publishing coordinates for com.itiox ownership

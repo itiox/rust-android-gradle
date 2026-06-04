@@ -20,7 +20,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.itiox.rust-android-gradle:plugin:0.9.8'
+        classpath 'com.itiox.rust-android-gradle:plugin:0.9.10'
     }
 }
 ```
@@ -33,7 +33,7 @@ buildscript {
 }
 
 plugins {
-    id "com.itiox.rust-android-gradle.rust-android" version "0.9.8"
+    id "com.itiox.rust-android-gradle.rust-android" version "0.9.10"
 }
 ```
 
